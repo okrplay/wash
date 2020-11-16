@@ -1,0 +1,10 @@
+[
+    (
+        check: "^node_modules$",
+        sibling_check: None,
+    ),
+    (
+        check: "^target$",
+        sibling_check: Some("^Cargo.toml$"),
+    )
+]
