@@ -57,8 +57,8 @@ impl Patterns for PatternVec {
         let file_type = dir_entry.file_type().unwrap();
         if !file_type.is_symlink() {
             let file_name_os = dir_entry.file_name();
-            let file_name = &*file_name_os.to_string_lossy();
-            if regex.is_match(file_name) {
+            let file_name = file_name_os.to_string_lossy();
+            if regex.is_match(file_name.as_ref()) {
                 return true;
             }
         }
