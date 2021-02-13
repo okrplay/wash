@@ -11,7 +11,12 @@ pub struct Pattern {
 }
 
 #[derive(Deserialize)]
-pub struct PatternRaw {
+struct PatternFile {
+    pattern: Vec<PatternRaw>,
+}
+
+#[derive(Deserialize)]
+struct PatternRaw {
     check: String,
     sibling_check: Option<String>,
 }
@@ -25,18 +30,22 @@ pub trait Patterns {
 
 impl Patterns for PatternVec {
     fn load_default(&mut self) {
-        let default = include_str!("default_patterns.ron");
+        let default = include_str!("default_patterns.toml");
         self.load_str(default);
     }
 
     fn load_str(&mut self, patterns_str: &str) {
-        let loaded_patterns_raw: Vec<PatternRaw> = ron::from_str(patterns_str).unwrap();
+        let loaded_patterns_raw: PatternFile =
+            toml::from_str(patterns_str).expect("couldn't serialize pattern file");
         let mut loaded_patterns: Vec<Pattern> = loaded_patterns_raw
+            .pattern
             .iter()
             .map(|pattern_raw| Pattern {
-                check: Regex::new(&pattern_raw.check).unwrap(),
+                check: Regex::new(&pattern_raw.check).expect("invalid regex"),
                 sibling_check: match &pattern_raw.sibling_check {
-                    Some(sibling_check_raw) => Some(Regex::new(sibling_check_raw).unwrap()),
+                    Some(sibling_check_raw) => {
+                        Some(Regex::new(sibling_check_raw).expect("invalid regex"))
+                    }
                     None => None,
                 },
             })

@@ -1,0 +1,6 @@
+[[pattern]]
+check = "^node_modules$"
+
+[[pattern]]
+check = "^target$"
+sibling_check = "^Cargo.toml$"
