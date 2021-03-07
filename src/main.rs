@@ -10,8 +10,9 @@ fn main() {
         (version: env!("CARGO_PKG_VERSION"))
         (author: "okrplay <32576280+okrplay@users.noreply.github.com>")
         (about: "Automatically cleans build directories like target, node_modules etc.")
-        (@arg DRY_RUN: --("dry-run") "Prints directories instead of deleting them")
-        (@arg DIRECTORY: +required "Sets the directory whose subdirectories are washed")
+        (@arg DRY_RUN: -d --("dry-run") "Print directories instead of deleting them")
+        (@arg HIDDEN: -h --hidden "Do not traverse directories starting with a dot")
+        (@arg DIRECTORY: +required "Set the directory whose subdirectories are washed")
     )
     .get_matches();
 
@@ -21,10 +22,11 @@ fn main() {
     let mut dir = read_dir(matches.value_of("DIRECTORY").unwrap())
         .expect("error: provided directory is not a directory");
     let dry_run = matches.is_present("DRY_RUN");
-    check_and_delete(&mut dir, &patterns, dry_run)
+    let hidden = matches.is_present("HIDDEN");
+    check_and_delete(&mut dir, &patterns, dry_run, hidden)
 }
 
-fn check_and_delete(dir: &mut ReadDir, patterns: &PatternVec, dry_run: bool) {
+fn check_and_delete(dir: &mut ReadDir, patterns: &PatternVec, dry_run: bool, hidden: bool) {
     // vec for dry run results
     let mut paths = Vec::new();
 
@@ -42,8 +44,15 @@ fn check_and_delete(dir: &mut ReadDir, patterns: &PatternVec, dry_run: bool) {
             } else {
                 paths.push(entry.path().to_string_lossy().to_string());
             }
-        } else if file_type.is_dir() {
-            check_and_delete(&mut read_dir(entry.path()).unwrap(), patterns, dry_run)
+        } else if file_type.is_dir()
+            && (!entry.file_name().to_string_lossy().starts_with(".") || hidden)
+        {
+            check_and_delete(
+                &mut read_dir(entry.path()).unwrap(),
+                patterns,
+                dry_run,
+                hidden,
+            )
         }
     }
 
