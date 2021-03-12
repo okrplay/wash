@@ -11,7 +11,7 @@ fn main() {
         (author: "okrplay <32576280+okrplay@users.noreply.github.com>")
         (about: "Automatically cleans build directories like target, node_modules etc.")
         (@arg DRY_RUN: -d --("dry-run") "Print directories instead of deleting them")
-        (@arg HIDDEN: -h --hidden "Do not traverse directories starting with a dot")
+        (@arg HIDDEN: -h --hidden "Traverse directories starting with a dot, which are ignored by default")
         (@arg DIRECTORY: +required "Set the directory whose subdirectories are washed")
     )
     .get_matches();
