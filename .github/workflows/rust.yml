@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -20,8 +19,8 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Build wash
+      - name: Check wash
         uses: actions-rs/cargo@v1
         with:
-          command: build
+          command: check
           toolchain: stable
